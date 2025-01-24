@@ -13,11 +13,13 @@ class Student(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
     group_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("groups.id"), nullable=False
+        Integer, ForeignKey("groups.id", ondelete="CASCADE"), nullable=False
     )
 
     group: Mapped[list["Group"]] = relationship(back_populates="students")
-    grades: Mapped[list["Grade"]] = relationship(back_populates="student")
+    grades: Mapped[list["Grade"]] = relationship(
+        back_populates="student", cascade="all, delete-orphan"
+    )
 
 
 class Group(Base):
@@ -26,7 +28,9 @@ class Group(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, unique=True, nullable=False)
 
-    students: Mapped[list["Student"]] = relationship(back_populates="group")
+    students: Mapped[list["Student"]] = relationship(
+        back_populates="group", cascade="all, delete-orphan"
+    )
 
 
 class Teacher(Base):
@@ -35,7 +39,9 @@ class Teacher(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
 
-    subjects: Mapped[list["Subject"]] = relationship(back_populates="teacher")
+    subjects: Mapped[list["Subject"]] = relationship(
+        back_populates="teacher", cascade="all, delete-orphan"
+    )
 
 
 class Subject(Base):
@@ -44,11 +50,13 @@ class Subject(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
     teacher_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("teachers.id"), nullable=False
+        Integer, ForeignKey("teachers.id", ondelete="CASCADE"), nullable=False
     )
 
     teacher: Mapped[list["Teacher"]] = relationship(back_populates="subjects")
-    grades: Mapped[list["Grade"]] = relationship(back_populates="subject")
+    grades: Mapped[list["Grade"]] = relationship(
+        back_populates="subject", cascade="all, delete-orphan"
+    )
 
 
 class Grade(Base):
@@ -56,10 +64,10 @@ class Grade(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     student_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("students.id"), nullable=False
+        Integer, ForeignKey("students.id", ondelete="CASCADE"), nullable=False
     )
     subject_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("subjects.id"), nullable=False
+        Integer, ForeignKey("subjects.id", ondelete="CASCADE"), nullable=False
     )
     grade: Mapped[float] = mapped_column(Float, nullable=False)
     date_received: Mapped[Date] = mapped_column(
